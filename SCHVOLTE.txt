@@ -1,4 +1,0 @@
-DB_NAME: bridgeme_schvolte_db
-DB_HOST: 131.153.148.98
-DB_USER: bridgeme_schvolte_admin
-DB_USER_PASSWORD: Schvolte@123..

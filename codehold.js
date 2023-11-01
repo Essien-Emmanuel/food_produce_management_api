@@ -111,3 +111,119 @@ exports.seed = knex => knex(Project.tableName).del()
     UNPROCESSABLE: 422,
     GENERIC_ERROR: 500
   }
+
+  /**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.up = function(knex) {
+  return knex.schema.renameTable('MarketProduct_tbl', 'MarketProduce_tbl');
+};
+
+/**
+* @param { import("knex").Knex } knex
+* @returns { Promise<void> }
+*/
+exports.down = function(knex) {
+  return knex.schema.renameTable('MarketProduce_tbl', 'MarketProduct_tbl');
+
+};
+
+///
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+
+exports.up = function(knex) {
+  return knex.schema.table('MarketProduce_tbl', table => {
+    table.renameColumn('product_id', 'produce_id')
+  })
+};
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = function(knex) {
+  return knex.schema.table('MarketProduce_tbl', table => {
+    table.renameColumn('produce_id', 'product_id')
+  })
+};
+
+exports.up = function(knex) {
+return knex.schema.table('MarketProduce_tbl', table => {
+  table.dropForeign(['product_id']);
+  table.foreign('produce_id').references('Produce_tbl.id').inTable('Produce_tbl');
+});
+};
+
+/**
+* @param { import("knex").Knex } knex
+* @returns { Promise<void> }
+*/
+exports.down = function(knex) {
+return knex.schema.table('MarketProduce_tbl', table => {
+  table.dropForeign(['produce_id']);
+  table.foreign('product_id').references('Produce_tbl.id').inTable('Produce_tbl')
+})
+};
+
+
+////
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+
+
+exports.up = async function(knex) {
+  return knex.schema.table('MarketProduct_tbl', table => {
+      table.string('unit2').defaultTo(null);
+  })
+};
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = async function(knex) {
+  return knex.schema.table('MarketProduct_tbl', table => {
+    table.dropColumn('unit2');
+  })
+};
+
+exports.up = async function(knex) {
+  return knex.schema.alterTable('MarketProduct_tbl', table => {
+    table.renameColumn('product_id', 'produce_id');
+    table.renameColumn('unit', 'unit1');
+  });
+};
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = async function(knex) {
+  return knex.schema.table('MarketProduct_tbl', table => {
+    table.renameColumn('produce_id', 'product_id')
+  })
+};
+
+exports.up = async function(knex) {
+return knex.schema.alterTable('MarketProduct_tbl', table => {
+  table.dropForeign(['product_id']);
+  table.foreign('produce_id').references('Produce_tbl.id').onDelete('CASCADE');
+});
+};
+
+/**
+* @param { import("knex").Knex } knex
+* @returns { Promise<void> }
+*/
+exports.down = function(knex) {
+return knex.schema.table('MarketProduct_tbl', table => {
+  table.dropForeign(['produce_id']);
+  table.foreign('product_id').references('Produce_tbl.id').onDelete('CASCADE')
+})
+};

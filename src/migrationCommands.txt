@@ -1,0 +1,3 @@
+ 
+ //to run the migration files in the migrations folder
+ npx knex migrate:latest --env development --knexfile knexFile.js

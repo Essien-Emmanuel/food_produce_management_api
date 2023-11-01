@@ -25,4 +25,5 @@ exports.up = async function(knex) {
  */
 exports.down = function(knex) {
     return knex.schema.dropTableIfExists('Product_tbl');
+
 };
