@@ -16,7 +16,7 @@ module.exports = {
       database : process.env.DB_NAME
     },
     migrations: {
-      directory: path.join(__dirname, '/models/migrations')
+      directory: path.join(__dirname, '/src/migrations')
     }
   },
 

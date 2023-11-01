@@ -17,6 +17,6 @@ app.use((error, req, res, next) => {
     const data = error.data || null;
     const stack = process.env.NODE_ENV === "development" ? error.stack : undefined;
     return res.status(200).json({ status, message, code, data, stack})
-})
+});
 
 module.exports = app

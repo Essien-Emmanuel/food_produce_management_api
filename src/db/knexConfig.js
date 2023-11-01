@@ -1,6 +1,6 @@
-'use strict'
+// 'use strict'
 
-const knexFile = require('../knexFile');
+const knexFile = require('../../knexfile');
 const env = process.env.NODE_ENV || 'development';
 
 //initialize knex

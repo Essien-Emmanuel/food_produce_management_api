@@ -1,3 +1,49 @@
+--Table structure for Produce_tbl--
+CREATE TABLE Produce_tbl (
+    id INT AUTO_INCREMENT NOT NULL,
+    producename VARCHAR(50) NOT NULL,
+    status INT NOT NULL,
+    statusname VARCHAR(50) DEFAULT NULL,
+    color VARCHAR(50) NOT NULL,
+    hexcolor VARCHAR(50),
+    unit1 VARCHAR(50) DEFAULT NULL,
+    unit2 VARCHAR(50) DEFAULT NULL,
+    conversionrate DECIMAL(18, 2) NOT NULL DEFAULT 0.00,
+    produceimageurl VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY(id)
+);
+--Table structure for Market_tbl--
+CREATE TABLE Market_tbl (
+    id INT AUTO_INCREMENT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    size INT,
+    type VARCHAR(20),
+    address VARCHAR(255),
+    description TEXT,
+    marketimageurl TEXT,
+    LgaId INT,
+    StateId INT,
+    CountryId INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY(id),
+    FOREIGN KEY(LgaId) REFERENCES LGA_tbl(id) ON DELETE CASCADE,
+    FOREIGN KEY(StateId) REFERENCES States_tbl(id) ON DELETE CASCADE,
+    FOREIGN KEY(CountryId) REFERENCES Country_tbl(id) ON DELETE CASCADE
+);
+--Table structure for MarketProduce_tbl--
+CREATE TABLE MarketProduce_tbl (
+    produce_id INT,
+    market_id INT,
+    price FLOAT,
+    unit1 VARCHAR(20),
+    unit2 VARCHAR(20),
+    PRIMARY KEY(produce_id, market_id),
+    FOREIGN KEY(produce_id) REFERENCES Produce_tbl(id) ON DELETE CASCADE,
+    FOREIGN KEY(market_id) REFERENCES Market_tbl(id) ON DELETE CASCADE
+);
 -- Table structure for table `LGA_tbl`
 --
 DROP TABLE IF EXISTS `LGA_tbl`;
