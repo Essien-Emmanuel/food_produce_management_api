@@ -102,7 +102,7 @@ exports.uploadProduceImage = async (req, res, next) => {
     if (!file) return next(new AppError('No file uploaded', 404));
     try {
         const produce = await knex.raw(`SELECT * FROM Produce_tbl WHERE id = ${req.params.produceId}`);
-        if (!produce) return next(new AppError('Produce not found', 404));
+        if (produce[0].length < 1) return next(new AppError('Produce not found', 404));
         const targetProduce = produce[0][0];
 
         const imgBuffer = file.buffer;
@@ -124,10 +124,12 @@ exports.uploadProduceImage = async (req, res, next) => {
         `);
         if (updateProduceImageUrl[0].affectedRows !== 1) return next(new AppError('Produce imageurl update failed', 500));
 
+        const prod = await knex.raw(`SELECT * FROM Produce_tbl WHERE id = ${req.params.produceId}`);
+
         return res.status(200).json({
             status: 'success',
             message: 'Image uploaded successfully',
-            data: { produce: targetProduce }
+            data: { produce: prod[0][0] }
         })
     } catch (error) {
         next(error)
@@ -137,7 +139,7 @@ exports.uploadProduceImage = async (req, res, next) => {
 exports.deleteProduceImage = async (req, res, next) => {
     try {
         const produce = await knex.raw(`SELECT * FROM Produce_tbl WHERE produceimageid = '${req.params.publicId}'`);
-        if (!produce) return next(new AppError('No Produce with public id found', 404));
+        if (produce[0].length < 1) return next(new AppError('No Produce with public id found', 404));
         const targetProduce = produce[0][0];
 
         await cloudinary.uploader.destroy(targetProduce.produceimageid, async (err, result) => {
@@ -149,12 +151,14 @@ exports.deleteProduceImage = async (req, res, next) => {
                 `);
                 if (updateProduceImageUrl[0].affectedRows !== 1) return next(new AppError('Produce imageurl update failed', 500));
 
+                const prod = await knex.raw(`SELECT * FROM Produce_tbl WHERE produceimageid = '${req.params.publicId}'`);
+
                 return res.status(200).json({
                     status: 'success',
                     message: 'Deleted image from cloudinary',
                     data: {
                         result: await result,
-                        produce: targetProduce
+                        produce: prod[0][0]
                     }
                 });
             }
@@ -168,7 +172,7 @@ exports.deleteProduceImage = async (req, res, next) => {
 exports.deleteProduce = async (req, res, next) => {
     try {
         const produce = await knex.raw(`SELECT * FROM Produce_tbl WHERE id = ${req.params.produceId}`);
-        if (!produce) return next(new AppError('Produce not found', 404));
+        if (produce[0].length < 1) return next(new AppError('Produce not found', 404));
         const targetProduce = produce[0][0];
 
         const deletedProduce = await knex.raw(`DELETE FROM Produce_tbl WHERE id = ${targetProduce.id}`);

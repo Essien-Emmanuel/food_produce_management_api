@@ -18,6 +18,6 @@ router.put('/upload-single-produceimage/:produceId', uploadImage.single('image')
 
 router.delete('/delete-single-produceimage/:publicId', adminProduceHandler.deleteProduceImage);
 
-router.delete('/delete-produce', adminProduceHandler.deleteProduce);
+router.delete('/delete-produce/:produceId', adminProduceHandler.deleteProduce);
 
 module.exports = router;
