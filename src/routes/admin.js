@@ -26,6 +26,8 @@ router.delete('/delete-produce/:produceId', adminProduceHandler.deleteProduce);
 /** Market */
 router.get('/get-markets', adminMarketHandler.getMarkets);
 
+router.get('/get-market/:marketId', adminMarketHandler.getMarket);
+
 router.post('/add-market/:countryId/:stateId/:lgaId', adminMarketHandler.addMarket);
 
 router.put('/update-market/:marketId', adminMarketHandler.updateMarket);

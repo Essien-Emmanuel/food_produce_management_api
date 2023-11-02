@@ -1,6 +1,8 @@
-const AppError = require('../error/error');
+const streamifier = require('streamifier'); 
 
+const AppError = require('../error/error');
 const knex = require('../../db/knexConfig');
+const cloudinary = require('../../configs/cloudinary');
 
 exports.getMarkets = async (req, res, next) => {
     try {
@@ -12,6 +14,21 @@ exports.getMarkets = async (req, res, next) => {
             message: 'Fetched all market successfully',
             data: { markets: markets[0] }
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.getMarket = async (req, res, next) => {
+    try {
+        const market = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${req.params.marketId}`);
+        if (market[0].length < 1) return next(new AppError('Market not found', 404));
+
+        return res.status(200).json({
+            status: 'success', 
+            message: 'Fetched single Market record successfully',
+            data: { market: market[0] }
+        })
     } catch (error) {
         next(error);
     }
