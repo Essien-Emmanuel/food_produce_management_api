@@ -193,7 +193,7 @@ exports.deleteProduce = async (req, res, next) => {
 
             return res.status(200).json({
                 status: "success",
-                message: "deleted an existing Sub Food Category and image file from cloudinary",
+                message: "deleted an existing Produce and image file from cloudinary",
                 data: {
                     items_deleted: targetProduce,
                     cloudinaryResult: {
