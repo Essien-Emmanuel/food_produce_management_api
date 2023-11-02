@@ -36,24 +36,22 @@ exports.getMarket = async (req, res, next) => {
 
 exports.addMarket = async (req, res, next) => {
     const { lgaId, stateId, countryId } = req.params;
-    const { name, size, type, address, description, marketImageurl, marketImageid } = req.body;
+    const { name, size, address, description} = req.body;
     try {
         const market = await knex.raw(`SELECT market_tbl.id FROM Market_tbl WHERE market_tbl.name = '${name}';`);
         if (market[0].length > 0) return next(new AppError('Market already exist', 422));
 
-        const newMarket = await knex.raw(`
-            INSERT INTO Market_tbl 
-            VALUES('${name}', ${size}, '${type}', '${address}', '${description}', '${marketImageurl}', ${lgaId}, ${stateId}, ${countryId}, '${marketImageid}');
+        await knex.raw(`
+            INSERT INTO Market_tbl(name, size, address, description, LgaId, StateId, CountryId)
+            VALUES('${name}', ${size}, '${address}', '${description}', ${lgaId}, ${stateId}, ${countryId});
         `);
 
-        console.log('new market ', newMarket);
+        const mkt = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${req.params.marketId}`);
+
         return res.status(200).json({
             status: 'success',
             message: 'Added a new market successfully',
-            data: { 
-                market: market[0],
-                newMarket: newMarket[0]
-            }
+            data: { newMarket: mkt[0] }
         });
     } catch (error) {
         next(error);
@@ -125,6 +123,31 @@ exports.uploadSingleMarketImage = async (req, res, next) => {
         })
     } catch (error) {
         next(error)
+    }
+}
+
+exports.updateMarketType = async (req, res, next) => {
+    try {
+        const market = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${req.params.marketId}`);
+        if (market[0].length < 1) return next(new AppError('Market not found', 404));
+        const targetMarket = market[0][0];
+
+        const updateMarketType = await knex.raw(`
+            UPDATE Market_tbl 
+            SET type = 'major' 
+            WHERE id = ${targetMarket.id}
+        `);
+        if (updateMarketType[0].affectedRows !== 1) return next(new AppError('Market type update failed', 500));
+
+        const mkt = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${req.params.marketId}`);
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Market type set to major successfully',
+            data: { market: mkt[0][0] }
+        })
+    } catch (error) {
+        next(error);
     }
 }
 

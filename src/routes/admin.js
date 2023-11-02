@@ -32,6 +32,8 @@ router.post('/add-market/:countryId/:stateId/:lgaId', adminMarketHandler.addMark
 
 router.put('/update-market/:marketId', adminMarketHandler.updateMarket);
 
+router.put('/update-markettype-major/:marketId', adminMarketHandler.updateMarketType);
+
 router.put('/upload-single-marketimage/:marketId', uploadImage.single('image'), adminMarketHandler.uploadSingleMarketImage);
 
 router.delete('/delete-single-marketimage/:publicId', adminMarketHandler.deleteMarketImage);
