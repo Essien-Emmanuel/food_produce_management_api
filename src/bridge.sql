@@ -1,4 +1,5 @@
 --Table structure for Produce_tbl--
+--
 CREATE TABLE Produce_tbl (
     id INT AUTO_INCREMENT NOT NULL,
     producename VARCHAR(50) NOT NULL,
@@ -15,7 +16,9 @@ CREATE TABLE Produce_tbl (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(id)
 );
+--
 --Table structure for Market_tbl--
+--
 CREATE TABLE Market_tbl (
     id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(50) NOT NULL,
@@ -34,17 +37,47 @@ CREATE TABLE Market_tbl (
     FOREIGN KEY(StateId) REFERENCES States_tbl(id) ON DELETE CASCADE,
     FOREIGN KEY(CountryId) REFERENCES Country_tbl(id) ON DELETE CASCADE
 );
+--
 --Table structure for MarketProduce_tbl--
+--
 CREATE TABLE MarketProduce_tbl (
     produce_id INT,
     market_id INT,
     price FLOAT,
     unit1 VARCHAR(20),
     unit2 VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY(produce_id, market_id),
     FOREIGN KEY(produce_id) REFERENCES Produce_tbl(id) ON DELETE CASCADE,
     FOREIGN KEY(market_id) REFERENCES Market_tbl(id) ON DELETE CASCADE
 );
+--
+--Table structure for table ProduceImage_tbl
+--
+CREATE TABLE ProduceImage_tbl (
+    id INT NOT NULL AUTO_INCREMENT,
+    imageurl TEXT,
+    imageid VARCHAR(50),
+    produce_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY(produce_id) REFERENCES Produce_tbl(id) ON DELETE CASCADE
+);
+--
+--Table structure for table MarketImage_tbl
+CREATE TABLE MarketImage_tbl (
+    id INT NOT NULL AUTO_INCREMENT,
+    imageurl TEXT,
+    imageid VARCHAR(50),
+    market_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY(market_id) REFERENCES Market_tbl(id) ON DELETE CASCADE
+);
+--
 -- Table structure for table `LGA_tbl`
 --
 DROP TABLE IF EXISTS `LGA_tbl`;
