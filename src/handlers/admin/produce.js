@@ -97,7 +97,7 @@ exports.updateProduce = async (req, res, next) => {
     }
 }
 
-exports.uploadProduceImage = async (req, res, next) => {
+exports.uploadSingleProduceImage = async (req, res, next) => {
     const file = req.file;
     if (!file) return next(new AppError('No file uploaded', 404));
     try {
@@ -135,6 +135,8 @@ exports.uploadProduceImage = async (req, res, next) => {
         next(error)
     }
 }
+
+
 
 exports.deleteProduceImage = async (req, res, next) => {
     try {
