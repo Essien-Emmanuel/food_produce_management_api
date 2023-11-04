@@ -3,7 +3,7 @@ const streamifier = require('streamifier');
 const AppError = require('../error/error');
 const knex = require('../../db/knexConfig');
 const cloudinary = require('../../configs/cloudinary');
-const { uploadSingleRecordImage, deleteRecordImage } = require('./common');
+const { uploadSingleRecordImage, deleteRecordImage, deleteRecord } = require('./common');
 
 exports.getMarkets = async (req, res, next) => {
     try {
@@ -196,37 +196,41 @@ exports.deleteMarketImage = async (req, res, next) => {
 }
 
 exports.deleteMarket = async (req, res, next) => {
-    try {
-        const market = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${req.params.marketId}`);
-        if (market[0].length < 1) return next(new AppError('Market not found', 404));
-        const targetMarket = market[0][0];
+    const dbTableName = 'Market_tbl';
+    const recordName = 'market';
+    const rowId = req.params.marketId
+    deleteRecordImage(req, res, next, dbTableName, recordName, rowId)
+    // try {
+    //     const market = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${req.params.marketId}`);
+    //     if (market[0].length < 1) return next(new AppError('Market not found', 404));
+    //     const targetMarket = market[0][0];
 
-        const deletedMarket = await knex.raw(`DELETE FROM Market_tbl WHERE id = ${targetMarket.id}`);
-        if (deletedMarket[0].affectedRows !== 1) return next(new AppError('Market could not be deleted', 500))
+    //     const deletedMarket = await knex.raw(`DELETE FROM Market_tbl WHERE id = ${targetMarket.id}`);
+    //     if (deletedMarket[0].affectedRows !== 1) return next(new AppError('Market could not be deleted', 500))
 
-        if (!targetMarket.marketimageid) return res.status(200).json({
-            status: "success",
-            message: "deleted an existing Market",
-            data: {
-                items_deleted: targetMarket,
-            },
-        }); 
+    //     if (!targetMarket.marketimageid) return res.status(200).json({
+    //         status: "success",
+    //         message: "deleted an existing Market",
+    //         data: {
+    //             items_deleted: targetMarket,
+    //         },
+    //     }); 
 
-        await cloudinary.uploader.destroy(targetMarket.marketimageid, async (error, result) => {
-            if (error) return next(new AppError('Poor network', 400)); 
+    //     await cloudinary.uploader.destroy(targetMarket.marketimageid, async (error, result) => {
+    //         if (error) return next(new AppError('Poor network', 400)); 
 
-            return res.status(200).json({
-                status: "success",
-                message: "deleted an existing Market and image file from cloudinary",
-                data: {
-                    items_deleted: targetMarket,
-                    cloudinaryResult: {
-                        result: await result
-                    },
-                },
-            });
-        });
-    } catch(error) {
-        next(error);
-    }
+    //         return res.status(200).json({
+    //             status: "success",
+    //             message: "deleted an existing Market and image file from cloudinary",
+    //             data: {
+    //                 items_deleted: targetMarket,
+    //                 cloudinaryResult: {
+    //                     result: await result
+    //                 },
+    //             },
+    //         });
+    //     });
+    // } catch(error) {
+    //     next(error);
+    // }
 }

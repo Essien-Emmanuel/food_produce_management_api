@@ -4,13 +4,13 @@ const AppError = require('../error/error');
 const knex = require('../../db/knexConfig');
 const cloudinary = require('../../configs/cloudinary');
 
-exports.uploadSingleRecordImage = async (req, res, next, dbTableName, tableName, rowId) => { //tableName = 'market', rowId = req.params.marketId
+exports.uploadSingleRecordImage = async (req, res, next, dbTableName, recordName, rowId) => { //recordName = 'market', rowId = req.params.marketId
     const file = req.file;
     if (!file) return next(new AppError('No file uploaded', 404));
     try {
-        const table = await knex.raw(`SELECT * FROM ${dbTableName} WHERE id = ${rowId}`);
-        if (table[0].length < 1) return next(new AppError(`${tableName} not found`, 404));
-        const targetTable= table[0][0];
+        const record = await knex.raw(`SELECT * FROM ${dbTableName} WHERE id = ${rowId}`);
+        if (record[0].length < 1) return next(new AppError(`${recordName} not found`, 404));
+        const targetRecord= record[0][0];
 
         const imgBuffer = file.buffer;
         const streamUpload = new Promise((resolve, reject) => {
@@ -27,51 +27,88 @@ exports.uploadSingleRecordImage = async (req, res, next, dbTableName, tableName,
 
         const updateRecordImageUrl = await knex.raw(`
             UPDATE ${dbTableName} 
-            SET ${tableName}imageurl = '${ result.secure_url}', ${tableName}imageid = '${result.public_id}' 
-            WHERE id = ${targetTable.id}
+            SET ${recordName}imageurl = '${ result.secure_url}', ${recordName}imageid = '${result.public_id}' 
+            WHERE id = ${targetRecord.id}
         `);
-        if (updateRecordImageUrl[0].affectedRows !== 1) return next(new AppError(`${tableName} imageurl update failed`, 500));
+        if (updateRecordImageUrl[0].affectedRows !== 1) return next(new AppError(`${recordName} imageurl update failed`, 500));
 
-        const record = await knex.raw(`SELECT * FROM ${dbTableName} WHERE id = ${rowId}`);
+        const retrievedRecord = await knex.raw(`SELECT * FROM ${dbTableName} WHERE id = ${rowId}`);
 
         return res.status(200).json({
             status: 'success',
             message: 'Image uploaded successfully',
-            data: { [tableName]: record[0][0] }
+            data: { [recordName]: retrievedRecord[0][0] }
         })
     } catch (error) {
         next(error)
     }
 }
 
-exports.deleteRecordImage = async (req, res, next, dbTableName, tableName, rowPublicId) => {
+exports.deleteRecordImage = async (req, res, next, dbTableName, recordName, rowPublicId) => {
     try {
-        const table = await knex.raw(`SELECT * FROM ${dbTableName} WHERE ${tableName}imageid = '${rowPublicId}'`);
-        if (table[0].length < 1) return next(new AppError(`No ${tableName} with public id found`, 404));
-        const targetTable = table[0][0];
+        const record = await knex.raw(`SELECT * FROM ${dbTableName} WHERE ${recordName}imageid = '${rowPublicId}'`);
+        if (record[0].length < 1) return next(new AppError(`No ${recordName} with public id found`, 404));
+        const targetRecord = record[0][0];
 
-        await cloudinary.uploader.destroy(targetTable[`${tableName}imageid`], async (err, result) => {
+        await cloudinary.uploader.destroy(targetRecord[`${recordName}imageid`], async (err, result) => {
             if (!err) {
                 const updateRecordImageUrl = await knex.raw(`
                     UPDATE ${dbTableName} 
-                    SET ${tableName}imageurl = '', ${tableName}imageid = '' 
-                    WHERE id = ${targetTable.id}
+                    SET ${recordName}imageurl = '', ${recordName}imageid = '' 
+                    WHERE id = ${targetRecord.id}
                 `);
-                if (updateRecordImageUrl[0].affectedRows !== 1) return next(new AppError(`${tableName} imageurl update failed`, 500));
+                if (updateRecordImageUrl[0].affectedRows !== 1) return next(new AppError(`${recordName} imageurl update failed`, 500));
 
-                const record = await knex.raw(`SELECT * FROM ${dbTableName} WHERE ${tableName}imageid = '${rowPublicId}'`);
-                console.log('record ', record[0])
+                const retrievedRecord = await knex.raw(`SELECT * FROM ${dbTableName} WHERE ${recordName}imageid = '${rowPublicId}'`);
+
+                console.log('record ', retrievedRecord[0]) //delete this log later
 
                 return res.status(200).json({
                     status: 'success',
-                    message:    `Deleted ${tableName} image from cloudinary`,
+                    message:    `Deleted ${recordName} image from cloudinary`,
                     data: {
-                        [ tableName ]: record[0][0],
+                        [ recordName ]: retrievedRecord[0][0],
                         result: await result,
                     }
                 });
             }
             return next(new AppError('Could not delete image from cloudinary due to poor network', 500))
+        });
+    } catch(error) {
+        next(error);
+    }
+}
+
+exports.deleteRecord = async (req, res, next, dbTableName, recordName, rowId) => {
+    try {
+        const record = await knex.raw(`SELECT * FROM ${dbTableName} WHERE id = ${rowId}`);
+        if (record[0].length < 1) return next(new AppError(`${recordName} not found`, 404));
+        const targetRecord = record[0][0];
+
+        const deletedRecord = await knex.raw(`DELETE FROM ${ dbTableName } WHERE id = ${targetRecord.id}`);
+        if (deletedRecord[0].affectedRows !== 1) return next(new AppError(`${recordName} could not be deleted`, 500))
+
+        if (!targetRecord[`${recordName}imageid`]) return res.status(200).json({
+            status: "success",
+            message: `deleted an existing ${recordName}`,
+            data: {
+                items_deleted: targetRecord,
+            },
+        }); 
+
+        await cloudinary.uploader.destroy(targetRecord[`${recordName}imageid`], async (error, result) => {
+            if (error) return next(new AppError('Poor network', 400)); 
+
+            return res.status(200).json({
+                status: "success",
+                message: `deleted an existing ${recordName} and image file from cloudinary`,
+                data: {
+                    items_deleted: targetRecord,
+                    cloudinaryResult: {
+                        result: await result
+                    },
+                },
+            });
         });
     } catch(error) {
         next(error);
