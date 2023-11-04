@@ -1,2 +1,2 @@
-ALTER TABLE produce_tbl
-ADD produceimageid VARCHAR(50)
+ALTER TABLE market_tbl
+ADD marketimageid VARCHAR(50);

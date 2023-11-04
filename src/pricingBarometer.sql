@@ -27,6 +27,7 @@ CREATE TABLE Market_tbl (
     address VARCHAR(255),
     description TEXT,
     marketimageurl TEXT,
+    marketimageid VARCHAR(50),
     LgaId INT,
     StateId INT,
     CountryId INT,

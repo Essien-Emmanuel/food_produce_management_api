@@ -26,5 +26,19 @@ router.delete('/delete-produce/:produceId', adminProduceHandler.deleteProduce);
 /** Market */
 router.get('/get-markets', adminMarketHandler.getMarkets);
 
+router.get('/get-market/:marketId', adminMarketHandler.getMarket);
+
+router.post('/add-market/:countryId/:stateId/:lgaId', adminMarketHandler.addMarket);
+
+router.put('/update-market/:marketId', adminMarketHandler.updateMarket);
+
+router.put('/update-markettype-major/:marketId', adminMarketHandler.updateMarketType);
+
+router.put('/upload-single-marketimage/:marketId', uploadImage.single('image'), adminMarketHandler.uploadSingleMarketImage);
+
+router.delete('/delete-single-marketimage/:publicId', adminMarketHandler.deleteMarketImage);
+
+router.delete('/delete-market/:marketId', adminMarketHandler.deleteMarket);
+
 
 module.exports = router;
