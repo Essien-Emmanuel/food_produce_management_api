@@ -70,7 +70,7 @@ exports.updateProduce = async (req, res, next) => {
     const reqObject = req.body;
     const produceId = req.params.produceId
     try {
-        const produce = await knex.raw(`SELECT * FROM Produce_tbl WHERE id = '${produceId}';`);
+        const produce = await knex.raw(`SELECT * FROM Produce_tbl WHERE id = ${produceId};`);
         if (produce[0].length < 1) return next(new AppError('No produce found with produce id', 404));
         const produceObject = produce[0][0]
         

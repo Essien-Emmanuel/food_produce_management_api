@@ -44,7 +44,7 @@ exports.addMarket = async (req, res, next) => {
 
         await knex.raw(`
             INSERT INTO Market_tbl(name, size, address, description, LgaId, StateId, CountryId)
-            VALUES('${name}', ${size}, '${address}', '${description}', ${lgaId}, ${stateId}, ${countryId});
+            VALUES('${name.toLowerCase()}', ${size}, '${address}', '${description}', ${lgaId}, ${stateId}, ${countryId});
         `);
 
         const mkt = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${req.params.marketId}`);
