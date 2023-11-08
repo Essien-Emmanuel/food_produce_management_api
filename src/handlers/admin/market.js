@@ -42,12 +42,12 @@ exports.addMarket = async (req, res, next) => {
         const market = await knex.raw(`SELECT market_tbl.id FROM Market_tbl WHERE market_tbl.name = '${name}';`);
         if (market[0].length > 0) return next(new AppError('Market already exist', 422));
 
-        await knex.raw(`
+        const newMarket = await knex.raw(`
             INSERT INTO Market_tbl(name, size, address, description, LgaId, StateId, CountryId)
             VALUES('${name.toLowerCase()}', ${size}, '${address}', '${description}', ${lgaId}, ${stateId}, ${countryId});
         `);
-
-        const mkt = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${req.params.marketId}`);
+        
+        const mkt = await knex.raw(`SELECT * FROM Market_tbl WHERE id = ${newMarket[0].insertId}`);
 
         return res.status(200).json({
             status: 'success',
