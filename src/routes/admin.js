@@ -4,6 +4,7 @@ const multer = require('multer');
 const adminProduceHandler = require('../handlers/admin/produce');
 const adminMarketHandler = require('../handlers/admin/market');
 const adminMarketProduceHandler = require('../handlers/admin/market-produce');
+const adminSearchMarketProduceHandler = require('../handlers/admin/search-produce');
 
 const router = express.Router();
 const uploadImage = multer();
@@ -43,6 +44,10 @@ router.delete('/delete-market/:marketId', adminMarketHandler.deleteMarket);
 
 
 /** market produce */
+router.get('/get-marketproduce-by-unit/:countryId/:stateId', adminSearchMarketProduceHandler.getMarketProducesByUnit);
+
+router.get('/get-marketproduce-by-state/:countryId/:stateId/:produceId', adminSearchMarketProduceHandler.getMarketProducesByState);
+
 router.get('/get-marketproduces', adminMarketProduceHandler.getMarketProduces);
 
 router.get('/get-marketproduce/:marketId/:produceId', adminMarketProduceHandler.getMarketProduce);
