@@ -52,7 +52,7 @@ exports.addMarketProduce = async (req, res, next) => {
             INSERT INTO MarketProduce_tbl(produce_id, market_id, price, unit1, unit2, producedescription)
             VALUES(${produceId}, ${marketId}, ${price}, '${unit1.toLowerCase()}', '${unit2.toLowerCase()}', '${produceDescription}');
         `);
-
+        
         const mktProd = await knex.raw(`SELECT * FROM MarketProduce_tbl WHERE produce_id = ${produceId} AND market_id = ${marketId};`);
 
         return res.status(200).json({

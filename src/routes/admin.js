@@ -48,6 +48,8 @@ router.get('/get-marketproduce-by-unit/:countryId/:stateId', adminSearchMarketPr
 
 router.get('/get-marketproduce-by-state/:countryId/:stateId/:produceId', adminSearchMarketProduceHandler.getMarketProducesByState);
 
+router.get('/get-marketproduce-avg-price/:countryId/:stateId/:produceId', adminSearchMarketProduceHandler.getMarketProduceAvgPrice);
+
 router.get('/get-marketproduces', adminMarketProduceHandler.getMarketProduces);
 
 router.get('/get-marketproduce/:marketId/:produceId', adminMarketProduceHandler.getMarketProduce);
