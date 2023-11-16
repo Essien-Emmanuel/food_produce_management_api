@@ -29,10 +29,10 @@ exports.getMarketProducesByState = async (req, res, next) => {
     const { countryId, stateId, produceId } = req.params;
     try {
         const marketProduce = await knex.raw(`
-        SELECT Produce_tbl.*, Market_tbl.*,  MarketProduce_tbl.* FROM MarketProduce_tbl
-        JOIN Produce_tbl ON MarketProduce_tbl.produce_id = Produce_tbl.id
-        JOIN Market_tbl ON MarketProduce_tbl.market_id = Market_tbl.id
-        WHERE MarketProduce_tbl.produce_id = ${produceId} AND Market_tbl.StateId = ${stateId} AND Market_tbl.CountryId = ${countryId};
+            SELECT Produce_tbl.*, Market_tbl.*,  MarketProduce_tbl.* FROM MarketProduce_tbl
+            JOIN Produce_tbl ON MarketProduce_tbl.produce_id = Produce_tbl.id
+            JOIN Market_tbl ON MarketProduce_tbl.market_id = Market_tbl.id
+            WHERE MarketProduce_tbl.produce_id = ${produceId} AND Market_tbl.StateId = ${stateId} AND Market_tbl.CountryId = ${countryId};
         `);
         if (marketProduce[0].length < 1) return next(new AppError(`No market produce  with stateId ${stateId} and country id ${countryId} found`, 404));
         
@@ -40,6 +40,40 @@ exports.getMarketProducesByState = async (req, res, next) => {
             status: 'success',
             message: `fetched  Market Produces with statedId ${stateId} and  country id ${countryId} successfully`,
             data: { marketProduce: marketProduce[0] }
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.getMarketProduceAvgPrice = async (req, res, next) => {
+    const { countryId, stateId, produceId } = req.params;
+    try {
+        const marketProduceAvgRecord = await knex.raw(`
+            SELECT Produce_tbl.*, Market_tbl.CountryId, Market_tbl.StateId, AVG(MarketProduce_tbl.price) AS avg_price
+            FROM MarketProduce_tbl
+            JOIN Produce_tbl ON MarketProduce_tbl.produce_id = Produce_tbl.id
+            JOIN Market_tbl ON MarketProduce_tbl.market_id = Market_tbl.id
+            WHERE MarketProduce_tbl.produce_id = ${produceId} AND Market_tbl.StateId = ${stateId} AND Market_tbl.CountryId = ${countryId};
+        `);
+
+        if (marketProduceAvgRecord[0].length < 1) return next(new AppError(`No market produce  with stateId ${stateId} and country id ${countryId} found`, 404));
+
+        const marketProduce = await knex.raw(`
+            SELECT Produce_tbl.*, Market_tbl.*,  MarketProduce_tbl.* FROM MarketProduce_tbl
+            JOIN Produce_tbl ON MarketProduce_tbl.produce_id = Produce_tbl.id
+            JOIN Market_tbl ON MarketProduce_tbl.market_id = Market_tbl.id
+            WHERE MarketProduce_tbl.produce_id = ${produceId} AND Market_tbl.StateId = ${stateId} AND Market_tbl.CountryId = ${countryId};
+        `);
+
+        
+        return res.status(200).json({
+            status: 'success',
+            message: `fetched  Market Produces with statedId ${stateId} and  country id ${countryId} successfully`,
+            data: { 
+                produceAvgResult: marketProduceAvgRecord[0],
+                marketProduce: marketProduce[0] 
+            }
         });
     } catch (error) {
         next(error);
